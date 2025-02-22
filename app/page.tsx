@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
+import type { MouseEvent, ChangeEvent, FormEvent } from 'react';
 
 interface Point {
   x: number;
@@ -183,8 +184,9 @@ const PointsList = ({ points, definitions, angles }: {
   );
 };
 
-// Zaktualizuj interfejs ImageData dla funkcji applySobelFilter
-interface SobelImageData extends ImageData {
+// Dodaj na początku pliku
+interface SobelImageData {
+  data: Uint8ClampedArray;
   width: number;
   height: number;
 }
@@ -218,7 +220,11 @@ const applySobelFilter = (ctx: CanvasRenderingContext2D, imageData: SobelImageDa
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
           const idx = ((y + i) * width + (x + j)) * 4;
-          const gray = (pixels[idx] + pixels[idx + 1] + pixels[idx + 2]) / 3;
+          // Konwertuj wartości na number przed operacjami arytmetycznymi
+          const r = Number(pixels[idx]);
+          const g = Number(pixels[idx + 1]);
+          const b = Number(pixels[idx + 2]);
+          const gray = (r + g + b) / 3;
           pixelX += gray * kernelX[i + 1][j + 1];
           pixelY += gray * kernelY[i + 1][j + 1];
         }
@@ -278,7 +284,7 @@ export default function Home() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
@@ -293,7 +299,7 @@ export default function Home() {
     }
   };
 
-  const handleUpload = async (e: React.FormEvent) => {
+  const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!file) {
@@ -443,7 +449,7 @@ export default function Home() {
       });
 
       // Update point drawing style
-      points.forEach((point, index) => {
+      points.forEach((point: Point, index: number) => {
         const def = POINT_DEFINITIONS[index];
         
         // Draw point
@@ -499,7 +505,7 @@ export default function Home() {
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -525,7 +531,7 @@ export default function Home() {
     }
 
     // Istniejąca logika dla punktów cefalometrycznych
-    const pointIndex = points.findIndex(point => {
+    const pointIndex = points.findIndex((point: Point) => {
       const distance = Math.sqrt(
         Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2)
       );
@@ -535,7 +541,7 @@ export default function Home() {
     if (pointIndex !== -1) {
       setDragPoint(pointIndex);
     } else if (points.length < POINT_DEFINITIONS.length) {
-      setPoints(prev => [...prev, { x, y }]);
+      setPoints((prev: Point[]) => [...prev, { x, y }]);
     } else {
       setMessage({ 
         type: 'error', 
@@ -544,7 +550,7 @@ export default function Home() {
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     if (dragPoint === null) return;
 
     const canvas = canvasRef.current;
@@ -556,14 +562,14 @@ export default function Home() {
 
     // Obsługa przeciągania punktów kalibracyjnych
     if (dragPoint === -1) {
-      setCalibrationLine(prev => ({
+      setCalibrationLine((prev: { start: Point; end: Point }) => ({
         ...prev,
         start: { x, y }
       }));
       return;
     }
     if (dragPoint === -2) {
-      setCalibrationLine(prev => ({
+      setCalibrationLine((prev: { start: Point; end: Point }) => ({
         ...prev,
         end: { x, y }
       }));
@@ -571,7 +577,7 @@ export default function Home() {
     }
 
     // Istniejąca logika dla punktów cefalometrycznych
-    setPoints(prev => prev.map((point, index) => 
+    setPoints((prev: Point[]) => prev.map((point: Point, index: number) => 
       index === dragPoint ? { x, y } : point
     ));
   };
@@ -657,7 +663,11 @@ export default function Home() {
   const createSketch = (ctx: CanvasRenderingContext2D, imageData: ImageData) => {
     const data = imageData.data;
     for (let i = 0; i < data.length; i += 4) {
-      const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      // Konwertuj wartości na number przed operacjami arytmetycznymi
+      const r = Number(data[i]);
+      const g = Number(data[i + 1]);
+      const b = Number(data[i + 2]);
+      const brightness = (r + g + b) / 3;
       const edge = 255 - brightness;
       data[i] = data[i + 1] = data[i + 2] = edge;
     }
