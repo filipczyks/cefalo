@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-form {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .messages {
+            margin: 20px 0;
+        }
+        .message {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #e3f2fd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Photo Upload</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <div class="upload-form">
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*">
+            <br><br>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+</html> 
