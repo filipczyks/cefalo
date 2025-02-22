@@ -341,12 +341,11 @@ export default function Home() {
   };
 
   const calculateAngle = (p1: Point, p2: Point, p3: Point): number => {
-    const angle = Math.atan2(p3.y - p2.y, p3.x - p2.x) -
-                 Math.atan2(p1.y - p2.y, p1.x - p2.x);
-    let deg = angle * 180 / Math.PI;
+    const angle: number = Math.atan2(p3.y - p2.y, p3.x - p2.x) -
+                Math.atan2(p1.y - p2.y, p1.x - p2.x);
+    let deg: number = angle * (180 / Math.PI);
     if (deg < 0) deg += 360;
-    // Zaokrąglij do 1 miejsca po przecinku i zwróć mniejszy kąt
-    return Number((deg > 180 ? 360 - deg : deg).toFixed(1));
+    return Math.round(deg);
   };
 
   const calculateDefinedAngles = (currentPoints: Point[]) => {
