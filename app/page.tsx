@@ -9,7 +9,7 @@ interface Point {
   y: number;
 }
 
-interface ImageData {
+interface CustomImageData {
   id: number;
   name: string;
   data: string;
@@ -249,9 +249,9 @@ export default function Home() {
   const [preview, setPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<Message | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [images, setImages] = useState<ImageData[]>([]);
+  const [images, setImages] = useState<CustomImageData[]>([]);
   const [points, setPoints] = useState<Point[]>([]);
-  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+  const [selectedImage, setSelectedImage] = useState<CustomImageData | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [angles, setAngles] = useState<Angle[]>([]);
   const [dragPoint, setDragPoint] = useState<number | null>(null);
@@ -313,7 +313,7 @@ export default function Home() {
     try {
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const imageData: ImageData = {
+        const imageData: CustomImageData = {
           id: Date.now(),
           name: file.name,
           data: reader.result as string,
@@ -617,7 +617,7 @@ export default function Home() {
     }
   }, [calibrationLine]);
 
-  const handleImageSelect = (image: ImageData) => {
+  const handleImageSelect = (image: CustomImageData) => {
     setSelectedImage(image);
     // Usuń linię resetującą punkty:
     // setPoints([]);
@@ -661,19 +661,24 @@ export default function Home() {
   };
 
   const createSketch = (ctx: CanvasRenderingContext2D, imageData: ImageData) => {
-    const pixels = new Uint8ClampedArray(imageData.data);
+    // Pobierz dane pikseli bezpośrednio z kontekstu
+    const pixels = imageData.data;
+    const output = new Uint8ClampedArray(pixels.length);
+    
     for (let i = 0; i < pixels.length; i += 4) {
       const r = pixels[i];
       const g = pixels[i + 1];
       const b = pixels[i + 2];
       const brightness = (r + g + b) / 3;
       const edge = 255 - brightness;
-      pixels[i] = edge;
-      pixels[i + 1] = edge;
-      pixels[i + 2] = edge;
-      pixels[i + 3] = 255; // Alpha
+      
+      output[i] = edge;
+      output[i + 1] = edge;
+      output[i + 2] = edge;
+      output[i + 3] = pixels[i + 3]; // Zachowaj oryginalną wartość alpha
     }
-    return new ImageData(pixels, imageData.width, imageData.height);
+    
+    return new ImageData(output, imageData.width);
   };
 
   return (
