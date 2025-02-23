@@ -661,17 +661,19 @@ export default function Home() {
   };
 
   const createSketch = (ctx: CanvasRenderingContext2D, imageData: ImageData) => {
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      // Konwertuj wartości na number przed operacjami arytmetycznymi
-      const r = Number(data[i]);
-      const g = Number(data[i + 1]);
-      const b = Number(data[i + 2]);
+    const pixels = new Uint8ClampedArray(imageData.data);
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
       const brightness = (r + g + b) / 3;
       const edge = 255 - brightness;
-      data[i] = data[i + 1] = data[i + 2] = edge;
+      pixels[i] = edge;
+      pixels[i + 1] = edge;
+      pixels[i + 2] = edge;
+      pixels[i + 3] = 255; // Alpha
     }
-    return imageData;
+    return new ImageData(pixels, imageData.width, imageData.height);
   };
 
   return (
