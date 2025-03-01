@@ -22,13 +22,21 @@ interface Message {
   text: string;
 }
 
-// Add new interface for angle
+// Dodaj interfejs dla normy
+interface AngleNorm {
+  mean: number;  // wartość średnia
+  deviation: number;  // odchylenie
+}
+
+// Zaktualizuj interfejs Angle
 interface Angle {
   points: [Point, Point, Point];
   value: number;
   name: string;
   description: string;
   isNew: boolean;
+  norm?: AngleNorm;  // dodaj normę
+  deviation?: number;  // dodaj odchylenie od normy
 }
 
 // Add new interfaces for point meaning
@@ -42,63 +50,67 @@ interface AngleDefinition {
   points: [number, number, number]; // Point IDs that form the angle
   name: string;
   description: string;
+  norm?: AngleNorm;
 }
 
 // Update point definitions for cephalometric landmarks
 const POINT_DEFINITIONS: PointDefinition[] = [
   { id: 1, name: 'N', description: 'Nasion - Punkt nosowy' },
   { id: 2, name: 'S', description: 'Sella - Środek siodła tureckiego' },
-  { id: 3, name: 'Or', description: 'Orbitale - Najniższy punkt oczodołu' },
-  { id: 4, name: 'Po', description: 'Porion - Najwyższy punkt przewodu słuchowego zewnętrznego' },
-  { id: 5, name: 'A', description: 'Punkt A - Najgłębszy punkt krzywizny szczęki' },
-  { id: 6, name: 'B', description: 'Punkt B - Najgłębszy punkt krzywizny żuchwy' },
-  { id: 7, name: 'Pg', description: 'Pogonion - Najbardziej wysunięty punkt bródki kostnej' },
-  { id: 8, name: 'Gn', description: 'Gnathion - Najbardziej dolny punkt bródki' },
-  { id: 9, name: 'Me', description: 'Menton - Najniższy punkt żuchwy' },
-  { id: 10, name: 'Go', description: 'Gonion - Punkt na kącie żuchwy' },
-  { id: 11, name: 'ANS', description: 'Kolec nosowy przedni' },
-  { id: 12, name: 'PNS', description: 'Kolec nosowy tylny' },
-  { id: 13, name: 'Ba', description: 'Basion - Najniższy punkt foramen magnum' },
-  { id: 14, name: 'Ar', description: 'Articulare - Punkt przecięcia kości podstawy czaszki z tylnym zarysem wyrostka kłykciowego' },
-  { id: 15, name: 'Pt', description: 'Pterygomaxillare - Punkt na tylnym zarysie szczeliny skrzydłowo-szczękowej' }
+  { id: 3, name: 'A', description: 'Punkt A - Najgłębszy punkt krzywizny szczęki' },
+  { id: 4, name: 'B', description: 'Punkt B - Najgłębszy punkt krzywizny żuchwy' },
+  { id: 5, name: 'Pg', description: 'Pogonion - Najbardziej wysunięty punkt bródki kostnej' },
+  { id: 6, name: 'Go', description: 'Gonion - Punkt na kącie żuchwy' },
+  { id: 7, name: 'Gn', description: 'Gnathion - Najbardziej dolny punkt bródki' },
+  { id: 8, name: 'ANS', description: 'Kolec nosowy przedni' },
+  { id: 9, name: 'PNS', description: 'Kolec nosowy tylny' },
+  { id: 10, name: 'Ar', description: 'Articulare - Przecięcie podstawy czaszki z tylnym zarysem wyrostka kłykciowego' }
 ];
 
-// Update angle definitions for cephalometric measurements
+// Dodaj normy do definicji kątów
 const ANGLE_DEFINITIONS: AngleDefinition[] = [
   {
-    points: [1, 2, 3], // N-S-Or
-    name: 'Kąt podstawy czaszki',
-    description: 'Nachylenie podstawy czaszki przedniego dołu czaszkowego'
-  },
-  {
-    points: [2, 1, 5], // S-N-A
+    points: [2, 1, 3], // S-N-A
     name: 'Kąt SNA',
-    description: 'Położenie szczęki względem podstawy czaszki'
+    description: 'Położenie szczęki względem podstawy czaszki',
+    norm: { mean: 82, deviation: 2 }
   },
   {
-    points: [2, 1, 6], // S-N-B
+    points: [2, 1, 4], // S-N-B
     name: 'Kąt SNB',
-    description: 'Położenie żuchwy względem podstawy czaszki'
+    description: 'Położenie żuchwy względem podstawy czaszki',
+    norm: { mean: 80, deviation: 2 }
   },
   {
-    points: [5, 1, 6], // A-N-B
+    points: [3, 1, 4], // A-N-B
     name: 'Kąt ANB',
-    description: 'Wzajemne położenie szczęki i żuchwy'
+    description: 'Wzajemne położenie szczęki i żuchwy',
+    norm: { mean: 2, deviation: 2 }
   },
   {
-    points: [10, 14, 1], // Go-Ar-N
+    points: [6, 10, 1], // Go-Ar-N
     name: 'Kąt gonialny',
-    description: 'Kąt żuchwy'
+    description: 'Kąt żuchwy (norma: 130° ± 7°)'
   },
   {
-    points: [1, 5, 7], // N-A-Pg
+    points: [8, 9, 6], // ANS-PNS-Go
+    name: 'Kąt podstawy szczęki do żuchwy',
+    description: 'Nachylenie płaszczyzny szczęki do żuchwy (norma: 25° ± 5°)'
+  },
+  {
+    points: [1, 3, 5], // N-A-Pg
     name: 'Kąt wypukłości twarzy',
-    description: 'Profil twarzy kostnej'
+    description: 'Profil twarzy kostnej (norma: 0° ± 5°)'
   },
   {
-    points: [2, 10, 9], // S-Go-Me
-    name: 'Kąt trzonu żuchwy',
-    description: 'Nachylenie trzonu żuchwy do podstawy czaszki'
+    points: [1, 8, 6], // N-ANS-Go
+    name: 'Kąt nachylenia szczęki',
+    description: 'Nachylenie szczęki do podstawy czaszki (norma: 8° ± 3°)'
+  },
+  {
+    points: [1, 7, 6], // N-Gn-Go
+    name: 'Kąt osi Y',
+    description: 'Kierunek wzrostu twarzy (norma: 59° ± 3°)'
   }
 ];
 
@@ -138,6 +150,12 @@ const PointsList = ({ points, definitions, angles }: {
   definitions: PointDefinition[],
   angles: Angle[]
 }) => {
+  const getDeviationColor = (deviation: number) => {
+    if (Math.abs(deviation) <= 1) return '#38a169'; // zielony dla małych odchyleń
+    if (Math.abs(deviation) <= 2) return '#d69e2e'; // żółty dla średnich
+    return '#e53e3e'; // czerwony dla dużych odchyleń
+  };
+
   return (
     <div className={styles.rightPanels}>
       <div className={styles.measurementsPanel}>
@@ -148,6 +166,21 @@ const PointsList = ({ points, definitions, angles }: {
               <div className={styles.angleInfo}>
                 <span className={styles.angleName}>{angle.name}</span>
                 <span className={styles.angleDescription}>{angle.description}</span>
+                {angle.norm && (
+                  <div className={styles.normInfo}>
+                    <span className={styles.normValue}>
+                      Norma: {angle.norm.mean}° ± {angle.norm.deviation}°
+                    </span>
+                    {angle.deviation !== undefined && (
+                      <span 
+                        className={styles.deviation}
+                        style={{ color: getDeviationColor(angle.deviation) }}
+                      >
+                        Odchylenie: {angle.deviation > 0 ? '+' : ''}{angle.deviation.toFixed(1)}°
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
               <span className={styles.angleValue}>{angle.value}°</span>
             </div>
@@ -244,148 +277,121 @@ const applySobelFilter = (ctx: CanvasRenderingContext2D, imageData: SobelImageDa
   return output;
 };
 
+// Dodaj nowy komponent dla instrukcji
+const PointInstruction = ({ currentPointIndex }: { currentPointIndex: number }) => {
+  if (currentPointIndex >= POINT_DEFINITIONS.length) {
+    return (
+      <div className={styles.instruction}>
+        Wszystkie punkty zostały zaznaczone
+      </div>
+    );
+  }
+
+  const point = POINT_DEFINITIONS[currentPointIndex];
+  return (
+    <div className={styles.instruction}>
+      <div className={styles.instructionHeader}>
+        Zaznacz punkt: <span className={styles.pointName}>{point.name}</span>
+      </div>
+      <div className={styles.instructionDescription}>
+        {point.description}
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [message, setMessage] = useState<Message | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [images, setImages] = useState<CustomImageData[]>([]);
-  const [points, setPoints] = useState<Point[]>([]);
   const [selectedImage, setSelectedImage] = useState<CustomImageData | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [message, setMessage] = useState<Message | null>(null);
+  const [points, setPoints] = useState<Point[]>([]);
   const [angles, setAngles] = useState<Angle[]>([]);
   const [dragPoint, setDragPoint] = useState<number | null>(null);
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
+  const [gamma, setGamma] = useState(1);
+  const [isSketch, setIsSketch] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [calibrationLine, setCalibrationLine] = useState<{ start: Point; end: Point }>({
     start: { x: 100, y: 100 },
     end: { x: 200, y: 100 }
   });
   const [scale, setScale] = useState<number | null>(null);
-  const [gamma, setGamma] = useState(1);
-  const [isSketch, setIsSketch] = useState(false);
-
-  useEffect(() => {
-    loadImages();
-  }, []);
-
-  const loadImages = async () => {
-    try {
-      const db = await initDB();
-      const transaction = db.transaction(['images'], 'readonly');
-      const store = transaction.objectStore('images');
-      const request = store.getAll();
-
-      request.onsuccess = () => {
-        setImages(request.result);
-      };
-    } catch (error) {
-      console.error('Error loading images:', error);
-    }
-  };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-    } else {
-      setFile(null);
-      setPreview(null);
-    }
-  };
-
-  const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    if (!file) {
-      setMessage({ type: 'error', text: 'Please select a file' });
-      return;
-    }
-
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
         const imageData: CustomImageData = {
           id: Date.now(),
-          name: file.name,
+          name: selectedFile.name,
           data: reader.result as string,
-          type: file.type,
+          type: selectedFile.type,
           date: new Date().toISOString()
         };
-
-        const db = await initDB();
-        const transaction = db.transaction(['images'], 'readwrite');
-        const store = transaction.objectStore('images');
-        await store.add(imageData);
-
-        setMessage({ type: 'success', text: 'Image saved successfully' });
-        setFile(null);
-        setPreview(null);
-        (e.target as HTMLFormElement).reset();
-        await loadImages();
-        // Automatically select the uploaded image
-        handleImageSelect(imageData);
+        setSelectedImage(imageData);
+        setupCanvas(imageData);
       };
-
-      reader.readAsDataURL(file);
-    } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error instanceof Error ? error.message : 'Error saving image'
-      });
-    } finally {
-      setIsLoading(false);
+      reader.readAsDataURL(selectedFile);
     }
   };
 
-  const calculateAngle = (p1: Point, p2: Point, p3: Point): number => {
-    const angle: number = Math.atan2(p3.y - p2.y, p3.x - p2.x) -
-                Math.atan2(p1.y - p2.y, p1.x - p2.x);
-    let deg: number = angle * (180 / Math.PI);
-    if (deg < 0) deg += 360;
-    return Math.round(deg);
-  };
+  const setupCanvas = (image: CustomImageData) => {
+    const img = new Image();
+    img.src = image.data;
+    img.onload = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-  const calculateDefinedAngles = (currentPoints: Point[]) => {
-    if (currentPoints.length < 2) return; // Potrzebujemy minimum 3 punktów do kąta
-
-    const newAngles: Angle[] = [];
-
-    // Sprawdź każdą definicję kąta
-    ANGLE_DEFINITIONS.forEach(def => {
-      const [p1Id, p2Id, p3Id] = def.points;
+      const maxWidth = 800;
+      const scale = Math.min(1, maxWidth / img.width);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
       
-      // Sprawdź czy mamy wszystkie potrzebne punkty dla tego kąta
-      if (currentPoints.length >= Math.max(p1Id, p2Id, p3Id)) {
-        const p1 = currentPoints[p1Id - 1];
-        const p2 = currentPoints[p2Id - 1];
-        const p3 = currentPoints[p3Id - 1];
-        
-        if (p1 && p2 && p3) { // Upewnij się, że wszystkie punkty istnieją
-          const angle: Angle = {
-            points: [p1, p2, p3],
-            value: calculateAngle(p1, p2, p3),
-            name: def.name,
-            description: def.description,
-            isNew: true
-          };
-          newAngles.push(angle);
-        }
-      }
-    });
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    // Sortuj kąty alfabetycznie według nazwy
-    newAngles.sort((a, b) => a.name.localeCompare(b.name));
-    
-    setAngles(newAngles);
+      // Narysuj obraz od razu
+      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(100%)`;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.filter = 'none';
+
+      // Zastosuj gamma jeśli potrzebne
+      if (gamma !== 1) {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+        
+        for (let i = 0; i < pixels.length; i += 4) {
+          pixels[i] = 255 * Math.pow(pixels[i] / 255, gamma);
+          pixels[i + 1] = 255 * Math.pow(pixels[i + 1] / 255, gamma);
+          pixels[i + 2] = 255 * Math.pow(pixels[i + 2] / 255, gamma);
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      // Rysuj linię kalibracyjną
+      ctx.beginPath();
+      ctx.strokeStyle = '#00FF00';
+      ctx.lineWidth = 2;
+      ctx.moveTo(calibrationLine.start.x, calibrationLine.start.y);
+      ctx.lineTo(calibrationLine.end.x, calibrationLine.end.y);
+      ctx.stroke();
+
+      // Rysuj punkty końcowe linii kalibracyjnej
+      [calibrationLine.start, calibrationLine.end].forEach((point, i) => {
+        ctx.beginPath();
+        ctx.fillStyle = '#00FF00';
+        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(i === 0 ? '0' : '1cm', point.x, point.y - 8);
+      });
+    };
   };
 
   const drawPoints = () => {
@@ -455,7 +461,7 @@ export default function Home() {
         // Draw point
         ctx.beginPath();
         ctx.fillStyle = '#FF5722';
-        ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI); // Mniejsze punkty dla większej precyzji
+        ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);
         ctx.fill();
         
         // Draw point border
@@ -463,26 +469,39 @@ export default function Home() {
         ctx.lineWidth = 1.5;
         ctx.stroke();
         
-        // Draw point label with background
-        const label = `${def.name}`;
-        ctx.font = 'bold 14px Arial';
+        // Draw label with better styling
+        const label = def.name;
+        ctx.font = 'bold 14px Inter';
         const textMetrics = ctx.measureText(label);
-        const padding = 3;
+        const padding = 6;
+        const boxWidth = textMetrics.width + (padding * 2);
+        const boxHeight = 22;
+        const arrowSize = 4; // Zmniejszony rozmiar strzałki
+        const tooltipGap = 8; // Mniejsza odległość od punktu
         
-        // Draw label background
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.fillRect(
-          point.x - textMetrics.width/2 - padding,
-          point.y - 20 - padding,
-          textMetrics.width + padding * 2,
-          16 + padding * 2
-        );
+        // Calculate position for tooltip (closer to the point)
+        const tooltipX = point.x - (boxWidth / 2);
+        const tooltipY = point.y - tooltipGap - arrowSize;
+        
+        // Draw tooltip background
+        ctx.fillStyle = 'rgba(33, 33, 33, 0.9)';
+        
+        // Draw main box
+        ctx.beginPath();
+        ctx.roundRect(tooltipX, tooltipY - boxHeight, boxWidth, boxHeight, 4);
+        
+        // Draw arrow (smaller and closer)
+        ctx.moveTo(point.x - arrowSize, tooltipY);
+        ctx.lineTo(point.x + arrowSize, tooltipY);
+        ctx.lineTo(point.x, tooltipY + arrowSize);
+        ctx.closePath();
+        ctx.fill();
         
         // Draw label text
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(label, point.x, point.y - 20);
+        ctx.fillText(label, point.x, tooltipY - (boxHeight / 2));
       });
 
       // Draw measurement lines
@@ -617,233 +636,163 @@ export default function Home() {
     }
   }, [calibrationLine]);
 
-  const handleImageSelect = (image: CustomImageData) => {
-    setSelectedImage(image);
-    // Usuń linię resetującą punkty:
-    // setPoints([]);
+  const calculateAngle = (p1: Point, p2: Point, p3: Point): number => {
+    const angle: number = Math.atan2(p3.y - p2.y, p3.x - p2.x) -
+                Math.atan2(p1.y - p2.y, p1.x - p2.x);
+    let deg: number = angle * (180 / Math.PI);
+    if (deg < 0) deg += 360;
+    return Math.round(deg);
+  };
 
-    const img = new Image();
-    img.src = image.data;
-    img.onload = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+  const calculateDefinedAngles = (currentPoints: Point[]) => {
+    if (currentPoints.length < 2) return;
 
-      const maxWidth = 800;
-      const scale = Math.min(1, maxWidth / img.width);
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
+    const newAngles: Angle[] = [];
+
+    ANGLE_DEFINITIONS.forEach(def => {
+      const [p1Id, p2Id, p3Id] = def.points;
       
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
-      // Przerysuj punkty i kąty jeśli istnieją
-      if (points.length > 0) {
-        drawPoints();
-        if (points.length === POINT_DEFINITIONS.length) {
-          calculateDefinedAngles(points);
+      if (currentPoints.length >= Math.max(p1Id, p2Id, p3Id)) {
+        const p1 = currentPoints[p1Id - 1];
+        const p2 = currentPoints[p2Id - 1];
+        const p3 = currentPoints[p3Id - 1];
+        
+        if (p1 && p2 && p3) {
+          const value = calculateAngle(p1, p2, p3);
+          const angle: Angle = {
+            points: [p1, p2, p3],
+            value,
+            name: def.name,
+            description: def.description,
+            isNew: true,
+            norm: def.norm
+          };
+          
+          // Oblicz odchylenie od normy jeśli norma istnieje
+          if (def.norm) {
+            angle.deviation = value - def.norm.mean;
+          }
+          
+          newAngles.push(angle);
         }
       }
-    };
-  };
+    });
 
-  const handleDelete = async (id: number) => {
-    try {
-      const db = await initDB();
-      const transaction = db.transaction(['images'], 'readwrite');
-      const store = transaction.objectStore('images');
-      await store.delete(id);
-      loadImages();
-    } catch (error) {
-      console.error('Error deleting image:', error);
-    }
-  };
-
-  const createSketch = (ctx: CanvasRenderingContext2D, imageData: ImageData) => {
-    // Pobierz dane pikseli bezpośrednio z kontekstu
-    const pixels = imageData.data;
-    const output = new Uint8ClampedArray(pixels.length);
-    
-    for (let i = 0; i < pixels.length; i += 4) {
-      const r = pixels[i];
-      const g = pixels[i + 1];
-      const b = pixels[i + 2];
-      const brightness = (r + g + b) / 3;
-      const edge = 255 - brightness;
-      
-      output[i] = edge;
-      output[i + 1] = edge;
-      output[i + 2] = edge;
-      output[i + 3] = pixels[i + 3]; // Zachowaj oryginalną wartość alpha
-    }
-    
-    return new ImageData(output, imageData.width);
+    newAngles.sort((a, b) => a.name.localeCompare(b.name));
+    setAngles(newAngles);
   };
 
   return (
     <main className={styles.main}>
-      <h1>Photo Gallery & Measurement</h1>
+      <h1>Analiza cefalometryczna</h1>
       
-      {message && (
-        <div className={`${styles.message} ${styles[message.type]}`}>
-          {message.text}
-        </div>
-      )}
-
-      <div className={styles.uploadContainer}>
-        <form onSubmit={handleUpload}>
-          <div className={styles.fileInputContainer}>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              accept="image/*"
-              id="file-input"
-            />
-            <label htmlFor="file-input" className={styles.fileInputLabel}>
-              Choose a file
-            </label>
-          </div>
-
-          {preview && (
-            <div className={styles.previewContainer}>
-              <img src={preview} alt="Preview" className={styles.previewImage} />
-            </div>
-          )}
-
-          <button 
-            type="submit" 
-            disabled={!file || isLoading}
-            className={styles.uploadButton}
-          >
-            {isLoading ? 'Saving...' : 'Upload'}
-          </button>
-        </form>
-      </div>
-
-      <div className={styles.gallery}>
-        <h2>Saved Images</h2>
-        <div className={styles.imageGrid}>
-          {images.map((image) => (
-            <div 
-              key={image.id} 
-              className={`${styles.imageCard} ${selectedImage?.id === image.id ? styles.selected : ''}`}
-              onClick={() => handleImageSelect(image)}
-            >
-              <img src={image.data} alt={image.name} />
-              <div className={styles.imageInfo}>
-                <span>{image.name}</span>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(image.id);
-                  }}
-                  className={styles.deleteButton}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {selectedImage && (
-        <div className={styles.measurementContainer}>
-          {scale && (
-            <div className={styles.scaleInfo}>
-              1 cm = {scale.toFixed(2)} pikseli
-            </div>
-          )}
-          <div className={styles.measurementGrid}>
-            <div className={styles.canvasContainer}>
-              <h3>Measurement Tool</h3>
-              <div className={styles.imageControls}>
-                <div className={styles.controlGroup}>
-                  <label htmlFor="brightness">Jasność: {brightness}%</label>
+      <div className={styles.measurementContainer}>
+        <div className={styles.measurementGrid}>
+          <div className={styles.canvasContainer}>
+            <div className={styles.uploadSection}>
+              {!selectedImage ? (
+                <div className={styles.fileInput}>
                   <input
-                    type="range"
-                    id="brightness"
-                    min="0"
-                    max="200"
-                    value={brightness}
-                    onChange={(e) => setBrightness(Number(e.target.value))}
+                    type="file"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    id="file-input"
                   />
+                  <label htmlFor="file-input">
+                    Wybierz zdjęcie cefalometryczne
+                  </label>
                 </div>
-                <div className={styles.controlGroup}>
-                  <label htmlFor="contrast">Kontrast: {contrast}%</label>
-                  <input
-                    type="range"
-                    id="contrast"
-                    min="0"
-                    max="200"
-                    value={contrast}
-                    onChange={(e) => setContrast(Number(e.target.value))}
-                  />
-                </div>
-                <div className={styles.controlGroup}>
-                  <label htmlFor="gamma">Gamma: {gamma.toFixed(2)}</label>
-                  <input
-                    type="range"
-                    id="gamma"
-                    min="0.1"
-                    max="2.5"
-                    step="0.1"
-                    value={gamma}
-                    onChange={(e) => setGamma(Number(e.target.value))}
-                  />
-                </div>
-                <div className={styles.controlButtons}>
-                  <button 
-                    onClick={() => setIsSketch(!isSketch)}
-                    className={`${styles.sketchButton} ${isSketch ? styles.active : ''}`}
-                  >
-                    {isSketch ? 'Pokaż oryginał' : 'Pokaż szkic'}
-                  </button>
+              ) : (
+                <>
+                  <div className={styles.imageControls}>
+                    <div className={styles.controlGroup}>
+                      <label htmlFor="brightness">Jasność: {brightness}%</label>
+                      <input
+                        type="range"
+                        id="brightness"
+                        min="0"
+                        max="200"
+                        value={brightness}
+                        onChange={(e) => setBrightness(Number(e.target.value))}
+                      />
+                    </div>
+                    <div className={styles.controlGroup}>
+                      <label htmlFor="contrast">Kontrast: {contrast}%</label>
+                      <input
+                        type="range"
+                        id="contrast"
+                        min="0"
+                        max="200"
+                        value={contrast}
+                        onChange={(e) => setContrast(Number(e.target.value))}
+                      />
+                    </div>
+                    <div className={styles.controlGroup}>
+                      <label htmlFor="gamma">Gamma: {gamma.toFixed(2)}</label>
+                      <input
+                        type="range"
+                        id="gamma"
+                        min="0.1"
+                        max="2.5"
+                        step="0.1"
+                        value={gamma}
+                        onChange={(e) => setGamma(Number(e.target.value))}
+                      />
+                    </div>
+                    <div className={styles.controlButtons}>
+                      <button 
+                        onClick={() => setIsSketch(!isSketch)}
+                        className={`${styles.sketchButton} ${isSketch ? styles.active : ''}`}
+                      >
+                        {isSketch ? 'Pokaż oryginał' : 'Pokaż szkic'}
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setBrightness(100);
+                          setContrast(100);
+                          setGamma(1);
+                          setIsSketch(false);
+                        }}
+                        className={styles.resetFiltersButton}
+                      >
+                        Reset filtrów
+                      </button>
+                    </div>
+                  </div>
+                  <PointInstruction currentPointIndex={points.length} />
+                  <div className={styles.canvasWrapper}>
+                    <canvas
+                      ref={canvasRef}
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onMouseUp={handleMouseUp}
+                      onMouseLeave={handleMouseUp}
+                      className={styles.measurementCanvas}
+                    />
+                  </div>
                   <button 
                     onClick={() => {
-                      setBrightness(100);
-                      setContrast(100);
-                      setGamma(1);
-                      setIsSketch(false);
-                    }}
-                    className={styles.resetFiltersButton}
+                      setPoints([]);
+                      setMessage(null);
+                    }} 
+                    className={styles.resetButton}
                   >
-                    Reset filtrów
+                    Resetuj punkty
                   </button>
-                </div>
-              </div>
-              
-              <p>Kliknij aby dodać punkty cefalometryczne ({points.length}/{POINT_DEFINITIONS.length})</p>
-              <div className={styles.canvasWrapper}>
-                <canvas
-                  ref={canvasRef}
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
-                  className={styles.measurementCanvas}
-                />
-              </div>
-              <button 
-                onClick={() => {
-                  setPoints([]);
-                  setMessage(null);
-                }} 
-                className={styles.resetButton}
-              >
-                Resetuj punkty
-              </button>
+                </>
+              )}
             </div>
-            
+          </div>
+          
+          {selectedImage && (
             <PointsList 
               points={points} 
               definitions={POINT_DEFINITIONS}
               angles={angles}
             />
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </main>
   );
 }

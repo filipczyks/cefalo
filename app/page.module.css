@@ -1,5 +1,5 @@
 .main {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Inter', -apple-system, sans-serif;
@@ -10,9 +10,36 @@
 .main h1 {
   text-align: center;
   color: #2c3e50;
-  font-size: 2.2rem;
+  font-size: 2rem;
   margin-bottom: 2rem;
-  font-weight: 600;
+}
+
+.fileInput {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.fileInput input {
+  display: none;
+}
+
+.fileInput label {
+  padding: 12px 24px;
+  background: #3182ce;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.fileInput label:hover {
+  background: #2c5282;
 }
 
 .measurementGrid {
@@ -97,17 +124,20 @@
 
 .angleItem {
   background: white;
-  padding: 12px;
+  padding: 16px;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .angleInfo {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .angleValue {
@@ -207,6 +237,8 @@
 .measurementCanvas {
   background: #fff;
   cursor: crosshair;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .noAngles {
@@ -273,4 +305,72 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+/* Dodaj nowe style dla tooltipów */
+.pointTooltip {
+  position: absolute;
+  background: rgba(33, 33, 33, 0.9);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  z-index: 1000;
+}
+
+.pointTooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(33, 33, 33, 0.9);
+}
+
+.instruction {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.instructionHeader {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.instructionHeader .pointName {
+  color: #3182ce;
+  font-weight: 600;
+}
+
+.instructionDescription {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.normInfo {
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+.normValue {
+  color: #718096;
+  display: block;
+}
+
+.deviation {
+  display: block;
+  font-weight: 500;
+  margin-top: 2px;
 } 
